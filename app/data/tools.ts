@@ -89,4 +89,14 @@ export const tools = [
     featured: true,
     isNew: true,
   },
+  {
+  title: "Scientific Calculator",
+  description:
+    "Perform advanced calculations with trigonometry, logarithms, powers, roots, constants and memory functions.",
+  link: "/scientific-calculator",
+  category: "Calculator",
+  popular: true,
+  featured: true,
+  isNew: true,
+},
 ];
