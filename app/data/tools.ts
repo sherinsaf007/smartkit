@@ -119,4 +119,14 @@ export const tools = [
   featured: true,
   isNew: true,
 },
+{
+  title: "Image to PDF",
+  description:
+    "Convert JPG, PNG and WebP images into a single PDF document online.",
+  link: "/image-to-pdf",
+  category: "PDF",
+  popular: true,
+ featured: true,
+  isNew: true,
+},
 ];
