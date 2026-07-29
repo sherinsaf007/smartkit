@@ -99,4 +99,14 @@ export const tools = [
   featured: true,
   isNew: true,
 },
+{
+  title: "Image Compressor",
+  description:
+    "Compress JPG, PNG and WebP images online without uploading them to a server.",
+  link: "/image-compressor",
+  category: "Image",
+  popular: true,
+  featured: true,
+  isNew: true,
+},
 ];
