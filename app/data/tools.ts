@@ -109,4 +109,14 @@ export const tools = [
   featured: true,
   isNew: true,
 },
+{
+  title: "Image Resizer",
+  description:
+    "Resize JPG, PNG and WebP images using custom dimensions or popular social media presets.",
+  link: "/image-resizer",
+  category: "Image",
+  popular: true,
+  featured: true,
+  isNew: true,
+},
 ];
