@@ -9,51 +9,49 @@ import {
   TaxResult,
 } from "../../lib/tax/incomeTax";
 
+type ComparisonResult = ReturnType<typeof compareRegimes>;
+
 export default function IncomeTaxCalculator() {
   const [financialYear, setFinancialYear] = useState("2026-27");
   const [regime, setRegime] = useState<"Old" | "New">("New");
-
   const [income, setIncome] = useState("");
-
   const [age, setAge] = useState("Below 60");
-
   const [deduction80C, setDeduction80C] = useState("");
-
   const [deduction80D, setDeduction80D] = useState("");
-
   const [hra, setHra] = useState("");
 
   const [result, setResult] = useState<TaxResult | null>(null);
-const [comparison, setComparison] = useState<any>(null);
+  const [comparison, setComparison] =
+    useState<ComparisonResult | null>(null);
 
   function calculate() {
-  const incomeValue = Number(income) || 0;
+    const incomeValue = Number(income);
+    const d80C = Number(deduction80C) || 0;
+    const d80D = Number(deduction80D) || 0;
+    const hraValue = Number(hra) || 0;
 
-  const d80C = Number(deduction80C) || 0;
-  const d80D = Number(deduction80D) || 0;
-  const hraValue = Number(hra) || 0;
+    if (!incomeValue || incomeValue <= 0) {
+      alert("Please enter a valid annual income.");
+      return;
+    }
 
-  const tax = calculateIncomeTax({
-    income: incomeValue,
-    regime,
-    deduction80C: d80C,
-    deduction80D: d80D,
-    hra: hraValue,
-  });
+    const tax = calculateIncomeTax({
+      income: incomeValue,
+      regime,
+      deduction80C: d80C,
+      deduction80D: d80D,
+      hra: hraValue,
+    });
 
-  setResult(tax);
-
-  const compare = compareRegimes(
-    incomeValue,
-    d80C,
-    d80D,
-    hraValue
-  );
-
-  setComparison(compare);
-}
+    const comparisonResult = compareRegimes(
+      incomeValue,
+      d80C,
+      d80D,
+      hraValue
+    );
 
     setResult(tax);
+    setComparison(comparisonResult);
   }
 
   function reset() {
@@ -65,6 +63,7 @@ const [comparison, setComparison] = useState<any>(null);
     setDeduction80D("");
     setHra("");
     setResult(null);
+    setComparison(null);
   }
 
   return (
@@ -105,27 +104,33 @@ const [comparison, setComparison] = useState<any>(null);
               marginBottom: "35px",
             }}
           >
-            Compare your tax under Old & New Regime instantly.
+            Compare your tax under the Old and New Tax Regimes.
           </p>
 
           <label>Financial Year</label>
 
           <select
             value={financialYear}
-            onChange={(e) => setFinancialYear(e.target.value)}
+            onChange={(e) => {
+              setFinancialYear(e.target.value);
+              setResult(null);
+              setComparison(null);
+            }}
             style={inputStyle}
           >
-            <option>2026-27</option>
-            <option>2025-26</option>
+            <option value="2026-27">2026-27</option>
+            <option value="2025-26">2025-26</option>
           </select>
 
           <label>Tax Regime</label>
 
           <select
             value={regime}
-            onChange={(e) =>
-              setRegime(e.target.value as "Old" | "New")
-            }
+            onChange={(e) => {
+              setRegime(e.target.value as "Old" | "New");
+              setResult(null);
+              setComparison(null);
+            }}
             style={inputStyle}
           >
             <option value="New">New Regime</option>
@@ -136,6 +141,7 @@ const [comparison, setComparison] = useState<any>(null);
 
           <input
             type="number"
+            min="0"
             value={income}
             onChange={(e) => setIncome(e.target.value)}
             placeholder="Enter Annual Income"
@@ -149,45 +155,42 @@ const [comparison, setComparison] = useState<any>(null);
             onChange={(e) => setAge(e.target.value)}
             style={inputStyle}
           >
-            <option>Below 60</option>
-            <option>60-80</option>
-            <option>Above 80</option>
+            <option value="Below 60">Below 60</option>
+            <option value="60-80">60–80</option>
+            <option value="Above 80">Above 80</option>
           </select>
 
           {regime === "Old" && (
             <>
-              <label>80C Deduction</label>
+              <label>80C Deduction (₹)</label>
 
               <input
                 type="number"
+                min="0"
                 value={deduction80C}
-                onChange={(e) =>
-                  setDeduction80C(e.target.value)
-                }
+                onChange={(e) => setDeduction80C(e.target.value)}
                 placeholder="Maximum ₹1,50,000"
                 style={inputStyle}
               />
 
-              <label>80D Deduction</label>
+              <label>80D Deduction (₹)</label>
 
               <input
                 type="number"
+                min="0"
                 value={deduction80D}
-                onChange={(e) =>
-                  setDeduction80D(e.target.value)
-                }
+                onChange={(e) => setDeduction80D(e.target.value)}
                 placeholder="Medical Insurance"
                 style={inputStyle}
               />
 
-              <label>HRA Exemption</label>
+              <label>HRA Exemption (₹)</label>
 
               <input
                 type="number"
+                min="0"
                 value={hra}
-                onChange={(e) =>
-                  setHra(e.target.value)
-                }
+                onChange={(e) => setHra(e.target.value)}
                 placeholder="House Rent Allowance"
                 style={inputStyle}
               />
@@ -199,22 +202,18 @@ const [comparison, setComparison] = useState<any>(null);
               display: "flex",
               gap: "15px",
               marginTop: "30px",
+              flexWrap: "wrap",
             }}
           >
-            <button
-              onClick={calculate}
-              style={primaryButton}
-            >
+            <button onClick={calculate} style={primaryButton}>
               Calculate Tax
             </button>
 
-            <button
-              onClick={reset}
-              style={secondaryButton}
-            >
+            <button onClick={reset} style={secondaryButton}>
               Reset
             </button>
           </div>
+
           {result && (
             <div
               style={{
@@ -234,6 +233,11 @@ const [comparison, setComparison] = useState<any>(null);
               >
                 Tax Summary
               </h2>
+
+              <ResultRow
+                label="Selected Regime"
+                value={`${regime} Regime`}
+              />
 
               <ResultRow
                 label="Taxable Income"
@@ -266,49 +270,52 @@ const [comparison, setComparison] = useState<any>(null);
 
               <ResultRow
                 label="Effective Tax Rate"
-                value={`${result.effectiveRate.toFixed(2)} %`}
+                value={`${result.effectiveRate.toFixed(2)}%`}
               />
+
               {comparison && (
-  <>
-    <hr
-      style={{
-        margin: "25px 0",
-        border: "none",
-        borderTop: "1px solid #ddd",
-      }}
-    />
+                <>
+                  <hr
+                    style={{
+                      margin: "25px 0",
+                      border: "none",
+                      borderTop: "1px solid #ddd",
+                    }}
+                  />
 
-    <h3
-      style={{
-        color: "#0D530E",
-        marginBottom: "20px",
-      }}
-    >
-      Tax Comparison
-    </h3>
+                  <h3
+                    style={{
+                      color: "#0D530E",
+                      marginBottom: "20px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Old vs New Regime
+                  </h3>
 
-    <ResultRow
-      label="Old Regime"
-      value={comparison.oldRegime.totalTax}
-    />
+                  <ResultRow
+                    label="Old Regime Tax"
+                    value={comparison.oldRegime.totalTax}
+                  />
 
-    <ResultRow
-      label="New Regime"
-      value={comparison.newRegime.totalTax}
-    />
+                  <ResultRow
+                    label="New Regime Tax"
+                    value={comparison.newRegime.totalTax}
+                  />
 
-    <ResultRow
-      label="Recommended"
-      value={comparison.recommended}
-    />
+                  <ResultRow
+                    label="Recommended"
+                    value={comparison.recommended}
+                    bold
+                  />
 
-    <ResultRow
-      label="You Save"
-      value={comparison.savings}
-      bold
-    />
-  </>
-)}
+                  <ResultRow
+                    label="Estimated Savings"
+                    value={comparison.savings}
+                    bold
+                  />
+                </>
+              )}
             </div>
           )}
         </div>
@@ -333,6 +340,7 @@ function ResultRow({
       style={{
         display: "flex",
         justifyContent: "space-between",
+        gap: "20px",
         marginBottom: "15px",
         fontWeight: bold ? "bold" : "normal",
         fontSize: bold ? "18px" : "16px",
@@ -340,9 +348,9 @@ function ResultRow({
     >
       <span>{label}</span>
 
-      <span>
+      <span style={{ textAlign: "right" }}>
         {typeof value === "number"
-          ? `₹ ${value.toLocaleString("en-IN", {
+          ? `₹${value.toLocaleString("en-IN", {
               maximumFractionDigits: 2,
             })}`
           : value}
@@ -363,7 +371,7 @@ const inputStyle = {
 };
 
 const primaryButton = {
-  flex: 1,
+  flex: "1 1 220px",
   padding: "15px",
   background: "#0D530E",
   color: "white",
@@ -375,7 +383,7 @@ const primaryButton = {
 };
 
 const secondaryButton = {
-  flex: 1,
+  flex: "1 1 220px",
   padding: "15px",
   background: "#E7E1B1",
   color: "#0D530E",
