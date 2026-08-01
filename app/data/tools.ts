@@ -129,4 +129,14 @@ export const tools = [
  featured: true,
   isNew: true,
 },
+{
+  title: "PDF Merge",
+  description:
+    "Merge multiple PDF files into a single document online without uploading them.",
+  link: "/pdf-merge",
+  category: "PDF",
+  popular: true,
+  featured: true,
+  isNew: true,
+},
 ];

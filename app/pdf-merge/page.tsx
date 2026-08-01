@@ -226,9 +226,13 @@ export default function PdfMerge() {
         useObjectStreams: true,
       });
 
-      const pdfBlob = new Blob([mergedPdfBytes], {
-        type: "application/pdf",
-      });
+      const pdfBuffer = new ArrayBuffer(mergedPdfBytes.byteLength);
+
+new Uint8Array(pdfBuffer).set(mergedPdfBytes);
+
+const pdfBlob = new Blob([pdfBuffer], {
+  type: "application/pdf",
+});
 
       const downloadUrl = URL.createObjectURL(pdfBlob);
       const link = document.createElement("a");
